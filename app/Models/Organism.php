@@ -13,4 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 class Organism extends Model
 {
     use HasFactory;
+
+    public $fillable = [ "genus", "species"];
 }

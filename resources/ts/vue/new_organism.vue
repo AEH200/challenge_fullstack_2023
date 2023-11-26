@@ -65,8 +65,10 @@ export default class NewOrganismVue extends Vue {
         this.msg = 'Adding new organism';
 
         try {
-            const response = await axios.post('/api/organisms/', data);
-            this.msg = 'Success';
+            if (this.genus && this.species) {
+                const response = await axios.post('/api/organisms/', data);
+                this.msg = 'Success';
+            } else this.msg = 'Fields cannot be empty';
         } catch (e){
             if (axios.isAxiosError(e) && e.response) {
                 this.msg = e.response.data.error;

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Abundance;
+use Validator;
+use App\Models\Crops;
 use App\Models\Organism;
 use App\Models\Sample;
 use Illuminate\Http\Request;
@@ -19,8 +22,8 @@ class BiomeController extends Controller
      * Returns a list of samples
      */
     public function listSamples(){
-
         return Sample::query()
+            ->with("crops") 
             ->withCount('abundances')
             ->get();
     }
@@ -32,12 +35,19 @@ class BiomeController extends Controller
 
         // Log is configured to print to stderr
         Log::info($request->all());
-
-        //
-        // TODO: Complete this method to create a new Organism instance
-        //
-
-        return response()->json(['error' => 'Not completed'], 400);
+        
+        $validator = Validator::make($request->all(), [
+            'genus' => 'required',
+            'species' => 'required',
+        ]);
+        if ($validator->fails()) {
+            //En caso de que alguno de los elementos se campo vacío devolveremos la excepcion generada por el VALIDATOR
+            return response()->json(['error' => $validator->errors()->first()], 400);
+        }
+        else {
+            $organism = new Organism();
+            $organism->fill($request->all())->save();
+        }
     }
 
     /**
@@ -52,14 +62,10 @@ class BiomeController extends Controller
      */
     public function listOrganismsTop10(){
 
-        //
-        // TODO: Return the top 10 organisms
-        //
-        // Could be done with plain sql or better using laravel models
+        //Devolvemos los 10 organismos mas repetidos en la tabla Abundance
 
-        return DB::select("
-            select * from organisms
-        ");
+        return response()->json(Abundance::select("organism_id", DB::raw("COUNT(*) as count"))->groupBy('organism_id')->orderByRaw('COUNT(*) DESC')->take(10)->with("organism")->get());
+
         
     }
 

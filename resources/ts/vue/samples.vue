@@ -15,8 +15,8 @@
                 <tr v-for="sample of samples" :key="sample.code">
                     <td>{{ sample.code }}</td>
                     <td>{{ sample.abundances_count }}</td>
-                    <!-- TODO: /api/samples does not provide crop -->
-                    <td></td>
+                    <!-- Compobamos la existencia de la relación -->
+                    <td >{{ sample.crops ? sample.crops.name : '' }}</td>
                 </tr>
             </tbody>
         </table>
